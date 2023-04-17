@@ -958,13 +958,19 @@ async function media_prepare(trackid) {
                 function(e, memfs) {
                     BrowserFS.FileSystem.OverlayFS.Create({"writable" :  memfs, "readable" : apkfs },
                         function(e, ovfs) {
-                            BrowserFS.FileSystem.MountableFileSystem.Create({
-                                '/' : ovfs
-                                }, async function(e, mfs) {
-                                    await BrowserFS.initialize(mfs);
-                                    await vm.FS.mount(vm.BFS, {root: track.mount.path}, track.mount.point );
-                                    setTimeout(()=>{track.ready=true}, 0)
-                                })
+                            BrowserFS.FileSystem.IndexedDB.Create(
+                                function (e, idbfs) {
+                                    BrowserFS.FileSystem.MountableFileSystem.Create({
+                                        '/' : ovfs,
+                                        '/saves' : idbfs
+                                        }, async function(e, mfs) {
+                                            await BrowserFS.initialize(mfs);
+                                            await vm.FS.mount(vm.BFS, {root: track.mount.path}, track.mount.point );
+                                            setTimeout(()=>{track.ready=true}, 0)
+                                        });
+                                    }
+                            );
+
                         }
                     );
                 }
