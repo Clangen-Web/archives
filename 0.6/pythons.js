@@ -954,7 +954,7 @@ async function media_prepare(trackid) {
         function apk_cb(e, apkfs){
             console.log(__FILE__, "930 mounting", hint, "onto", track.mount.point)
 
-            BrowserFS.FileSystem.IndexedDb.Create(
+            BrowserFS.FileSystem.IndexedDB.Create(
                 function(e, idbfs) {
                     BrowserFS.FileSystem.OverlayFS.Create({"writable" :  idbfs, "readable" : apkfs },
                         function(e, ovfs) {
