@@ -954,21 +954,17 @@ async function media_prepare(trackid) {
         function apk_cb(e, apkfs){
             console.log(__FILE__, "930 mounting", hint, "onto", track.mount.point)
 
-            BrowserFS.FileSystem.InMemory.Create(
-                function(e, memfs) {
-                    BrowserFS.FileSystem.OverlayFS.Create({"writable" :  memfs, "readable" : apkfs },
+            BrowserFS.FileSystem.IndexedDb.Create(
+                function(e, idbfs) {
+                    BrowserFS.FileSystem.OverlayFS.Create({"writable" :  idbfs, "readable" : apkfs },
                         function(e, ovfs) {
-                            BrowserFS.FileSystem.IndexedDB.Create(
-                                function (e, idbfs) {
-                                    BrowserFS.FileSystem.MountableFileSystem.Create({
-                                        '/' : ovfs,
-                                        '/saves' : idbfs
-                                        }, async function(e, mfs) {
-                                            await BrowserFS.initialize(mfs);
-                                            await vm.FS.mount(vm.BFS, {root: track.mount.path}, track.mount.point );
-                                            setTimeout(()=>{track.ready=true}, 0)
-                                        });
-                                    }
+                            BrowserFS.FileSystem.MountableFileSystem.Create({
+                                '/' : ovfs
+                                }, async function(e, mfs) {
+                                    await BrowserFS.initialize(mfs);
+                                    await vm.FS.mount(vm.BFS, {root: track.mount.path}, track.mount.point );
+                                    setTimeout(()=>{track.ready=true}, 0)
+                                }
                             );
 
                         }
